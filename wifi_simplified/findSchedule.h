@@ -10,7 +10,7 @@ void CloseAll() {
     digitalWrite(ZONE5,HIGH);
     digitalWrite(ZONE6,HIGH);
     digitalWrite(PUMP,HIGH);
-    Serial.println("Zones Off");
+    //Serial.println("Zones Off");
   }
 
 
@@ -25,7 +25,7 @@ void ReadCommand(char* fromServer) {
     digitalWrite(ZONE5,HIGH);
     digitalWrite(ZONE6,HIGH);
     digitalWrite(PUMP,LOW);
-    Serial.println("Zone 1 On");
+    //Serial.println("Zone 1 On");
   } else if(fromServer[1] == '2' && fromServer[3] == '1') {     // Zone 2
     digitalWrite(ZONE2,LOW);
     digitalWrite(ZONE1,HIGH);
@@ -34,7 +34,7 @@ void ReadCommand(char* fromServer) {
     digitalWrite(ZONE5,HIGH);
     digitalWrite(ZONE6,HIGH);
     digitalWrite(PUMP,LOW);
-    Serial.println("Zone 2 On");
+    //Serial.println("Zone 2 On");
   } else if(fromServer[1] == '3' && fromServer[3] == '1') {        // Zone 3
     digitalWrite(ZONE3,LOW);
     digitalWrite(ZONE2,HIGH);
@@ -43,7 +43,7 @@ void ReadCommand(char* fromServer) {
     digitalWrite(ZONE5,HIGH);
     digitalWrite(ZONE6,HIGH);
     digitalWrite(PUMP,LOW);
-    Serial.println("Zone 3 On");
+    //Serial.println("Zone 3 On");
   } else if(fromServer[1] == '4' && fromServer[3] == '1') {        // Zone 4
     digitalWrite(ZONE4,LOW);
     digitalWrite(ZONE2,HIGH);
@@ -52,7 +52,7 @@ void ReadCommand(char* fromServer) {
     digitalWrite(ZONE5,HIGH);
     digitalWrite(ZONE6,HIGH);
     digitalWrite(PUMP,LOW);
-    Serial.println("Zone 4 On");
+    //Serial.println("Zone 4 On");
   } else if(fromServer[1] == '5' && fromServer[3] == '1') {        // Zone 5
     digitalWrite(ZONE5,LOW);
     digitalWrite(ZONE2,HIGH);
@@ -61,7 +61,7 @@ void ReadCommand(char* fromServer) {
     digitalWrite(ZONE4,HIGH);
     digitalWrite(ZONE6,HIGH);
     digitalWrite(PUMP,LOW);
-    Serial.println("Zone 5 On");
+    //Serial.println("Zone 5 On");
   } else if(fromServer[1] == '6' && fromServer[3] == '1') {        // Zone 6
     digitalWrite(ZONE6,LOW);
     digitalWrite(ZONE2,HIGH);
@@ -70,7 +70,7 @@ void ReadCommand(char* fromServer) {
     digitalWrite(ZONE5,HIGH);
     digitalWrite(ZONE4,HIGH);
     digitalWrite(PUMP,LOW);
-    Serial.println("Zone 6 On");
+    //Serial.println("Zone 6 On");
   }
   else {
     CloseAll(); 
@@ -88,7 +88,7 @@ void determineSchedule() {
 
   //port 80 is typical of a www page
   if (client.connect(server, 80)) {
-    Serial.println("connected");
+    //Serial.println("connected");
     client.print("GET ");
     client.print(location);
     client.print("/WateringSchedule.php?");
@@ -101,12 +101,16 @@ void determineSchedule() {
     
     int start = 0;
     int i = 0;
+    unsigned long beginTime = millis(); // time since started in milliseconds
+    unsigned long Curtime = millis();
+    
     char command[] = "";
-    while (client.connected() || client.available()) { //connected or data available
+    while ((client.connected() || client.available()) && Curtime - 10000 < beginTime) { //connected or data available and only opens connection for 10 seconds before getting out
+      Curtime = millis();
       char c = client.read();
-      
+     
       if (c == '{' || start == 1) {
-        Serial.print(c);
+        //Serial.print(c);
         command[i] = c;
         start = 1;
         i++;
@@ -116,15 +120,15 @@ void determineSchedule() {
   }
     
     //delay(500);
-    Serial.println(command);
+    //Serial.println(command);
     ReadCommand(command);
 
     client.flush();
     client.stop();
-    Serial.println("End of Find Schedule");
+    //Serial.println("End of Find Schedule");
   }else{
-    Serial.println("connection failed");
-    Serial.println("Reseting board");
+    //Serial.println("connection failed");
+    //Serial.println("Reseting board");
     resetFunc(); 
   }
 }

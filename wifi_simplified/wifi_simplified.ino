@@ -10,7 +10,6 @@
 #include <WiFi.h>
 #include <SPI.h>
 
-//#include <aJSON.h>
 
 const int ZONE1 = 2;
 const int ZONE2 = 3;
@@ -21,6 +20,8 @@ const int ZONE6 = 8;
 const int PUMP = 9;
 
 char serialNumber[] = "234234"; // need hardware serial number
+boolean wifiOn = false;
+unsigned long beginTime = millis(); // time since started in milliseconds
 
 // initialize ip
 IPAddress ip = WiFi.localIP();
@@ -33,11 +34,13 @@ void(* resetFunc) (void) = 0; //declare reset function @ address 0
 #include "connectToWifi.h";
 //#include "connectToServer.h";
 #include "findSchedule.h";
+#include "SDcard.h";
 //char fromServer[] = {1,1}; 
 
 
 
 void setup() {
+  wifiOn = false;
   pinMode(ZONE1, OUTPUT);
   pinMode(ZONE2 ,OUTPUT);
   pinMode(ZONE3 ,OUTPUT);
@@ -63,15 +66,18 @@ void setup() {
 
 void loop() {
   //connectAndRead(moistureValue, pHValue, serialNumber); //connect to the server and read the output
+  if(!client.connected()) {
+    connectToWifi();
+    wifiOn = false;
+  }
+  
+  
   
   determineSchedule(); // pulls schedule from server
-  Serial.println("exit determine Schedule");
+  //Serial.println("exit determine Schedule");
   delay(10000);
-}
-
-
-void checkTime(int Time) {
-  
+// add functionality to reset every 6 hours
+// add functionality to save to SD card
   
 }
 
