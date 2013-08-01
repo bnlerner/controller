@@ -85,7 +85,7 @@ void ReadCommand(char* fromServer) {
 void determineSchedule() {
   
    Serial.println("connecting...");
-
+  int availableMemory = freeRam();
   //port 80 is typical of a www page
   if (client.connect(server, 80)) {
     //Serial.println("connected");
@@ -94,6 +94,10 @@ void determineSchedule() {
     client.print("/WateringSchedule.php?");
     client.print("&deviceCode=");
     client.print(serialNumber);
+    client.print("&previousResponse=");
+    client.print(command);
+    client.print("&availableRam=");
+    client.print(availableMemory);
     client.println(" HTTP/1.1");
     client.println("Host: www.opti-lawn.com");
     client.println("Connection: close");
@@ -104,7 +108,8 @@ void determineSchedule() {
     unsigned long beginTime = millis(); // time since started in milliseconds
     unsigned long Curtime = millis();
     
-    char command[] = "";
+    
+    memset(&command[0], 0, sizeof(command));
     while ((client.connected() || client.available()) && Curtime - 10000 < beginTime) { //connected or data available and only opens connection for 10 seconds before getting out
       Curtime = millis();
       char c = client.read();

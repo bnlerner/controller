@@ -9,7 +9,8 @@
 #include <Time.h>
 #include <WiFi.h>
 #include <SPI.h>
-
+//#include <SD.h>
+#include <MemoryFree.h>
 
 const int ZONE1 = 2;
 const int ZONE2 = 3;
@@ -21,10 +22,13 @@ const int PUMP = 9;
 
 char serialNumber[] = "234234"; // need hardware serial number
 boolean wifiOn = false;
-unsigned long beginTime = millis(); // time since started in milliseconds
+unsigned long startTime = millis();// time since started in milliseconds
 
 // initialize ip
 IPAddress ip = WiFi.localIP();
+
+// command
+char command[] = "";
 
 
 void(* resetFunc) (void) = 0; //declare reset function @ address 0
@@ -33,10 +37,10 @@ void(* resetFunc) (void) = 0; //declare reset function @ address 0
 //#include "writeWifiData.h";
 #include "connectToWifi.h";
 //#include "connectToServer.h";
+#include "Memory.h";
 #include "findSchedule.h";
-#include "SDcard.h";
+//#include "SDcard.h";
 //char fromServer[] = {1,1}; 
-
 
 
 void setup() {
@@ -61,6 +65,14 @@ void setup() {
   connectToWifi();
   //printWifiData();
   
+   // make sure that the default chip select pin is set to
+  // output, even if you don't use it:
+ // pinMode(10, OUTPUT);
+  // if (!SD.begin(chipSelect)) {
+    //Serial.println("Card failed, or not present");
+    // don't do anything more:
+ //   return;
+ // }
 }
 
 
@@ -78,10 +90,15 @@ void loop() {
   delay(10000);
 // add functionality to reset every 6 hours
 // add functionality to save to SD card
-  
+  //void saveData(dataFile)
+  startTime = millis();
+  if(startTime > 21600000) {
+    resetFunc();
+  }
 }
 
 
 
+ 
 
 
