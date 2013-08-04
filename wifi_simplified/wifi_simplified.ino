@@ -10,7 +10,11 @@
 #include <WiFi.h>
 #include <SPI.h>
 //#include <SD.h>
-#include <MemoryFree.h>
+//#include <MemoryFree.h>
+//#include <SubMenuItem.h>
+//#include <SubMenu.h>
+//#include <MenuItem.h>
+//#include <Menu.h>
 
 const int ZONE1 = 2;
 const int ZONE2 = 3;
@@ -30,14 +34,18 @@ IPAddress ip = WiFi.localIP();
 // command
 char command[] = "";
 
-
 void(* resetFunc) (void) = 0; //declare reset function @ address 0
+
+int freeRam () { // show free ram
+  extern int __heap_start, *__brkval; 
+  int v; 
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+}
 
 //include headers
 //#include "writeWifiData.h";
 #include "connectToWifi.h";
 //#include "connectToServer.h";
-#include "Memory.h";
 #include "findSchedule.h";
 //#include "SDcard.h";
 //char fromServer[] = {1,1}; 
@@ -64,17 +72,7 @@ void setup() {
   
   connectToWifi();
   //printWifiData();
-  
-   // make sure that the default chip select pin is set to
-  // output, even if you don't use it:
- // pinMode(10, OUTPUT);
-  // if (!SD.begin(chipSelect)) {
-    //Serial.println("Card failed, or not present");
-    // don't do anything more:
- //   return;
- // }
 }
-
 
 void loop() {
   //connectAndRead(moistureValue, pHValue, serialNumber); //connect to the server and read the output
@@ -83,21 +81,19 @@ void loop() {
     wifiOn = false;
   }
   
-  
-  
   determineSchedule(); // pulls schedule from server
   //Serial.println("exit determine Schedule");
   delay(10000);
-// add functionality to reset every 6 hours
-// add functionality to save to SD card
+  // add functionality to save to SD card
   //void saveData(dataFile)
   startTime = millis();
-  if(startTime > 21600000) {
+  if(startTime > 21600000) { // functionality to reset every 6 hours
     resetFunc();
   }
 }
 
 
+/// menu options
 
  
 
