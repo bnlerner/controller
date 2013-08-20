@@ -1,5 +1,6 @@
 WiFiClient client;
 char server[] = "www.opti-lawn.com";
+//IPAddress server(74,125,115,105); //google
 char location[] = "http://opti-lawn.com";
 
 void CloseAll() {
@@ -84,11 +85,14 @@ void ReadCommand(char* fromServer) {
 //function will read schedule from server
 void determineSchedule() {
   
-   Serial.println("connecting...");
+   //Serial.println("connecting...");
   int availableMemory = freeRam();
+ // Serial.print("available Memory:    ");
+  //Serial.println(availableMemory);
   //port 80 is typical of a www page
   if (client.connect(server, 80)) {
     //Serial.println("connected");
+    //delay(500);
     client.print("GET ");
     client.print(location);
     client.print("/WateringSchedule.php?");
@@ -109,7 +113,7 @@ void determineSchedule() {
     unsigned long Curtime = millis();
     
     
-    memset(&command[0], 0, sizeof(command));
+    memset(&command[0], 0, sizeof(command)); // resetting the variable command
     while ((client.connected() || client.available()) && Curtime - 10000 < beginTime) { //connected or data available and only opens connection for 10 seconds before getting out
       Curtime = millis();
       char c = client.read();
@@ -132,9 +136,13 @@ void determineSchedule() {
     client.stop();
     //Serial.println("End of Find Schedule");
   }else{
-    //Serial.println("connection failed");
-    //Serial.println("Reseting board");
-    resetFunc(); 
+    Serial.println("connection failed");
+    //Serial.println("Resetting board")
+    delay(500);
+    client.flush();
+    client.stop();
+    command[6] = '{0,0}';
+    ReadCommand(command); 
   }
 }
 

@@ -24,7 +24,8 @@ const int ZONE5 = 6;
 const int ZONE6 = 8;
 const int PUMP = 9;
 
-char serialNumber[] = "234234"; // need hardware serial number
+//char serialNumber[] = "234234"; // need hardware serial number
+char serialNumber[] = "111111"; // need hardware serial number from me
 boolean wifiOn = false;
 unsigned long startTime = millis();// time since started in milliseconds
 
@@ -76,25 +77,28 @@ void setup() {
 
 void loop() {
   //connectAndRead(moistureValue, pHValue, serialNumber); //connect to the server and read the output
-  if(!client.connected()) {
+  if(status = WL_CONNECTED) {
+    //Serial.println("connected");
+    determineSchedule(); // pulls schedule from server
+    //Serial.println("exit determine Schedule");
+  } else {
+    Serial.println("WiFi not connected. attempting to reconnect");
+    delay(500);
     connectToWifi();
-    wifiOn = false;
+    wifiOn = false;    
   }
-  
-  determineSchedule(); // pulls schedule from server
-  //Serial.println("exit determine Schedule");
   delay(10000);
   // add functionality to save to SD card
   //void saveData(dataFile)
   startTime = millis();
-  if(startTime > 21600000) { // functionality to reset every 6 hours
+  //Serial.print("Time since restart: ");
+  //Serial.print(startTime/1000);
+  //Serial.println(" Seconds");
+  if((startTime > 21600000 || freeRam() < 50) && command[3] != '1') { // functionality to reset every 6 hours or if ram less than 50
+    Serial.println("resetting because over 6 hours");
+    delay(500);
     resetFunc();
   }
 }
-
-
 /// menu options
-
- 
-
 
